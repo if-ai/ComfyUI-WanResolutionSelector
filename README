@@ -1,0 +1,124 @@
+# Video Resolution Selector Node for ComfyUI
+
+A ComfyUI custom node that automatically selects appropriate video resolution dimensions based on generation mode, aspect ratio, and quality settings. Designed to work seamlessly with video generation models and KJNodes image resize nodes.
+
+## 🎯 Purpose
+
+This node simplifies the process of selecting the correct resolution for various video generation models by providing an intuitive interface with mode, aspect ratio, and quality dropdowns instead of manually entering width and height values.
+
+## 📋 Features
+
+- **Smart Resolution Selection**: Automatically outputs the correct width and height based on your selections
+- **Multiple Video Modes**: Support for Image-to-Video (480p/720p) and Text-to-Video (1.3B/14B) models
+- **Aspect Ratio Options**: Horizontal (landscape), Vertical (portrait), and Squarish
+- **Quality Tiers**: High Quality (HQ), Medium Quality (MQ), and Low Quality (LQ)
+- **KJNodes Compatible**: Outputs standard INT values compatible with KJNodes resize nodes
+
+## 🚀 Installation
+
+1. Navigate to your ComfyUI custom nodes directory:
+   ```
+   ComfyUI/custom_nodes/
+   ```
+
+2. Create a new folder (if desired) or place the node file directly in custom_nodes:
+   ```
+   ComfyUI/custom_nodes/video_resolution_selector.py
+   ```
+
+3. Restart ComfyUI or reload custom nodes
+
+4. The node will appear in the node menu under `KJNodes/video/Video Resolution Selector 🎬`
+
+## 📊 Supported Resolutions
+
+### Image to Video - 720p (I2V720p)
+- **Horizontal**: 1280×720 (HQ), 832×480 (MQ), 704×544 (LQ)
+- **Vertical**: 720×1280 (HQ), 480×832 (MQ), 544×704 (LQ)
+- **Squarish**: 624×624 (all qualities)
+
+### Image to Video - 480p (I2V480p)
+- **Horizontal**: 832×480 (HQ), 704×544 (MQ/LQ)
+- **Vertical**: 480×832 (HQ), 544×704 (MQ/LQ)
+- **Squarish**: 624×624 (all qualities)
+
+### Text to Video - 14B Model (T2V14B)
+- **Horizontal**: 1280×720 (HQ), 1088×832 (MQ), 832×480 (LQ)
+- **Vertical**: 720×1280 (HQ), 832×1088 (MQ), 480×832 (LQ)
+- **Squarish**: 960×960 (HQ), 624×624 (MQ), 544×704 (LQ)
+
+### Text to Video - 1.3B Model (T2V1.3B)
+- **Horizontal**: 832×480 (HQ), 704×544 (MQ/LQ)
+- **Vertical**: 480×832 (HQ), 544×704 (MQ/LQ)
+- **Squarish**: 624×624 (all qualities)
+
+## 🎮 Usage
+
+### Basic Workflow
+
+1. **Add the Node**: Right-click in ComfyUI and navigate to `KJNodes/video/Video Resolution Selector 🎬`
+
+2. **Configure Settings**:
+   - **Mode**: Select your video generation model type
+   - **Aspect Ratio**: Choose orientation (Horizontal/Vertical/Squarish)
+   - **Quality**: Pick quality level (HQ/MQ/LQ)
+
+3. **Connect Outputs**:
+   - Connect `width` output to width input of resize nodes
+   - Connect `height` output to height input of resize nodes
+
+### Example Workflow
+
+```
+[Load Image] → [Video Resolution Selector] → [Image Resize KJ] → [Video Generation Model]
+                          ↓                           ↓
+                       width                       height
+```
+
+## 🔧 Node Details
+
+### Inputs
+| Parameter | Type | Options | Default | Description |
+|-----------|------|---------|---------|-------------|
+| mode | Dropdown | I2V480p, I2V720p, T2V1.3B, T2V14B | I2V720p | Video generation mode |
+| aspect_ratio | Dropdown | Horizontal, Vertical, Squarish | Horizontal | Aspect ratio orientation |
+| quality | Dropdown | HQ, MQ, LQ | HQ | Quality level |
+
+### Outputs
+| Output | Type | Description |
+|--------|------|-------------|
+| width | INT | Width in pixels |
+| height | INT | Height in pixels |
+
+## 💡 Tips
+
+- **HQ (High Quality)**: Use for final renders or when quality is paramount
+- **MQ (Medium Quality)**: Good balance between quality and generation speed
+- **LQ (Low Quality)**: Use for quick previews or testing
+
+- **Aspect Ratio Guide**:
+  - **Horizontal**: Best for landscape scenes, wide shots
+  - **Vertical**: Ideal for portrait videos, mobile-first content
+  - **Squarish**: Good for social media posts, balanced compositions
+
+## 🤝 Compatibility
+
+- Designed to work with KJNodes Image Resize nodes
+- Compatible with any node accepting INT inputs for width/height
+- Tested with ComfyUI latest versions
+
+## 🐛 Troubleshooting
+
+If you encounter issues:
+
+1. **Node not appearing**: Ensure the file is in the correct directory and restart ComfyUI
+2. **Invalid resolution**: The node includes fallback to 832×480 if an invalid combination is selected
+3. **Connection issues**: Ensure you're connecting INT outputs to INT inputs
+
+## 📝 License
+
+This node is provided as-is for use with ComfyUI. Feel free to modify and distribute as needed.
+
+## 🙏 Credits
+
+Created for seamless integration with video generation workflows in ComfyUI, specifically designed to work with KJNodes ecosystem.
