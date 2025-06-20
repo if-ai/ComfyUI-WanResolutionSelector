@@ -21,14 +21,11 @@ This node simplifies the process of selecting the correct resolution for various
    ComfyUI/custom_nodes/
    ```
 
-2. Create a new folder (if desired) or place the node file directly in custom_nodes:
-   ```
-   ComfyUI/custom_nodes/video_resolution_selector.py
-   ```
+2. Place the `ComfyUI-WanResolutionSelector` folder (this repository) inside your `custom_nodes` directory.
 
-3. Restart ComfyUI or reload custom nodes
+3. Restart ComfyUI.
 
-4. The node will appear in the node menu under `KJNodes/video/Video Resolution Selector 🎬`
+4. The node will appear in the node menu under the `ImpactFrames💥🎞️/utils` category.
 
 ## 📊 Supported Resolutions
 
@@ -56,7 +53,7 @@ This node simplifies the process of selecting the correct resolution for various
 
 ### Basic Workflow
 
-1. **Add the Node**: Right-click in ComfyUI and navigate to `KJNodes/video/Video Resolution Selector 🎬`
+1. **Add the Node**: Right-click in ComfyUI and navigate to `ImpactFrames💥🎞️/utils` -> `Video Resolution Selector 🎬`.
 
 2. **Configure Settings**:
    - **Mode**: Select your video generation model type
