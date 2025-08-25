@@ -1,4 +1,7 @@
 import math
+import os
+
+WEB_DIRECTORY = os.path.join(os.path.dirname(__file__), "web")
 
 VAE_STRIDE = (4, 8, 8)
 PATCH_SIZE = (1, 2, 2)
@@ -190,19 +193,31 @@ class VideoResolutionSelector:
         },
     }
     
-    @classmethod
+    @classmethod  
     def INPUT_TYPES(cls):
         modes = list(cls.RESOLUTIONS.keys())
+        # Get all possible aspect ratios but organize them better
+        all_aspect_ratios = set()
+        for mode_resolutions in cls.RESOLUTIONS.values():
+            all_aspect_ratios.update(mode_resolutions.keys())
+        
+        # Sort aspect ratios in a logical order
+        aspect_order = ["Horizontal", "Vertical", "Squarish", "Square", "Cinematic", 
+                       "Landscape", "Portrait", "Wide", "Tall", "UltraWide", "UltraTall"]
+        sorted_aspects = [ar for ar in aspect_order if ar in all_aspect_ratios]
+        # Add any remaining aspects not in our predefined order
+        sorted_aspects.extend(sorted([ar for ar in all_aspect_ratios if ar not in aspect_order]))
+        
         return {
             "required": {
                 "mode": (modes, {"default": modes[0], "tooltip": "Generation mode"}),
-                "aspect_ratio": (["Horizontal", "Vertical", "Squarish", "Cinematic", "Square", "Landscape", "Portrait", "Wide", "Tall", "UltraWide", "UltraTall"], {"default": "Horizontal"}),
+                "aspect_ratio": (sorted_aspects, {"default": "Horizontal", "tooltip": "Aspect ratio (some options may not be available for all modes)"}),
                 "quality": (["HQ", "MQ", "LQ"], {"default": "HQ"}),
             },
             "optional": {
                 "enable_radial_attention": ("BOOLEAN", {"default": False, "tooltip": "Enable radial attention compatibility"}),
                 "radial_mode": (["upscale", "downscale", "closest"], {"default": "upscale", "tooltip": "How to adjust resolutions for radial attention"}),
-                "block_size": ([64, 128], {"default": 64, "tooltip": "Radial attention block size"}),
+                "block_size": ([64, 128], {"default": 128, "tooltip": "Radial attention block size"}),
             }
         }
     
@@ -211,8 +226,37 @@ class VideoResolutionSelector:
     FUNCTION = "get_resolution"
     CATEGORY = "ImpactFrames💥🎞️/utils"
     
-    def get_resolution(self, mode, aspect_ratio, quality, enable_radial_attention=False, radial_mode="upscale", block_size=64):
+    def get_resolution(self, mode, aspect_ratio, quality, enable_radial_attention=False, radial_mode="upscale", block_size=128):
         try:
+            # Check if aspect ratio is valid for the selected mode
+            if aspect_ratio not in self.RESOLUTIONS[mode]:
+                available_aspects = list(self.RESOLUTIONS[mode].keys())
+                if available_aspects:
+                    # Try to find a sensible fallback
+                    fallback_mapping = {
+                        "Cinematic": "Horizontal",
+                        "Square": "Squarish", 
+                        "Landscape": "Horizontal",
+                        "Portrait": "Vertical",
+                        "Wide": "Horizontal",
+                        "Tall": "Vertical", 
+                        "UltraWide": "Horizontal",
+                        "UltraTall": "Vertical"
+                    }
+                    
+                    # Try the mapped fallback first
+                    fallback = fallback_mapping.get(aspect_ratio)
+                    if fallback and fallback in available_aspects:
+                        aspect_ratio = fallback
+                    else:
+                        # Use first available
+                        aspect_ratio = available_aspects[0]
+                    
+                    print(f"Warning: '{aspect_ratio}' aspect ratio not available for '{mode}' mode. Available options: {', '.join(available_aspects)}. Using '{aspect_ratio}' instead.")
+                else:
+                    print(f"Error: No aspect ratios available for mode '{mode}'")
+                    return (832, 480)
+            
             w, h = self.RESOLUTIONS[mode][aspect_ratio][quality]
             
             # Apply radial attention compatibility if enabled
@@ -220,8 +264,8 @@ class VideoResolutionSelector:
                 w, h = calculate_radial_compatible_resolution(w, h, radial_mode, block_size)
             
             return (w, h)
-        except KeyError:
-            # fallback default
+        except KeyError as e:
+            print(f"Error getting resolution for {mode}-{aspect_ratio}-{quality}: {e}")
             return (832, 480)
 
 
